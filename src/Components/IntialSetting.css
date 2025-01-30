@@ -1,89 +1,102 @@
 .showSetting {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.2);
-
-    display: flex;
-    justify-content: center;
-    align-items: center ;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .showSetting-inner {
-    position: relative;
-    padding: 32px;
-    width: 100%;
-    max-width: 640px;
-    background-color: #1e1e1e;
+  position: relative;
+  border-radius: 12px;
+  padding: 32px;
+  width: 45%;
+  max-width: 100%;
+  background-color: #1e1e1e;
+  max-height: 80vh; /* Limits height to 80% of the viewport */
+  overflow-y: auto; /* Enables vertical scrolling when content overflows */
 }
 
+/* Dark Themed Scrollbar */
+.showSetting-inner::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.showSetting-inner::-webkit-scrollbar-track {
+  background: #2a2a2a; /* Darker track background */
+  border-radius: 5px;
+}
+
+.showSetting-inner::-webkit-scrollbar-thumb {
+  background: #444; /* Darker scrollbar handle */
+  border-radius: 5px;
+}
+
+.showSetting-inner::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Lighter on hover */
+}
+
+/* For Firefox */
+.showSetting-inner {
+  scrollbar-color: #444 #2a2a2a; /* Scrollbar thumb and track */
+  scrollbar-width: thin;
+}
+
+/* Ensure the close button stays fixed */
 .showSetting-inner .close-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-
-    background: #ff4d4d;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #ff4d4d;
+  color: white;
+  padding: 9px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.showSetting-inner .save-btn {
-    background: #007BFF; /* A nice blue color */
-    color: white; /* Better contrast with blue */
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-    font-size: 16px;
-    transition: background 0.3s ease, transform 0.2s ease;
+/* Ensure the title stays at the top */
+.showSetting-inner .setting-size {
+  position: absolute;
+  font-weight: bold;
+  font-size: 1.25em;
+  top: 16px;
+  left: 16px;
 }
 
-.showSetting-inner .save-btn:hover {
-    background: #0056b3; /* Darker blue on hover */
-    transform: scale(1.05); /* Slight scale effect for better UI */
+/* Form groups styling */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.showSetting-inner .save-btn:active {
-    background: #00408a; /* Even darker blue when clicked */
-    transform: scale(0.98); /* Pressed effect */
+.form-group label {
+  font-size: large;
+  margin-bottom: 5px;
 }
 
-/* .modal {
-    background: 1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 400px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  } */
-  
-  h3 {
-    text-align: left;
+input, select, textarea {
+  background: #1E1E1E;
+  color: #DDD;
+  border: 1px solid #444;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+  font-size: 16px;
+  transition: border 0.3s ease, background 0.3s ease;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .showSetting-inner {
+      width: 90%;
+      max-height: 75vh; /* Adjust height for smaller screens */
   }
-  .form-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .form-group label {
-    /* font-weight: bold; */
-    font-size: large;
-    margin-bottom: 5px;
-  }
-  
-  input, select, textarea {
-    background: #1E1E1E;  /* Dark gray, not full black */
-    color: #DDD;          /* Light gray text */
-    border: 1px solid #444; /* Subtle border */
-    padding: 10px;
-    border-radius: 5px;
-    width: 100%;
-    font-size: 16px;
-    transition: border 0.3s ease, background 0.3s ease;
-  }
-  
+}

@@ -31,51 +31,11 @@ function Home() {
         />
 
         <p>
-          Tap the spinner to enter the settings
+          Enter the settings to proceed
         </p>
 
-        <IntialSetting trigger={showSettings} setTrigger={setShowSettings}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-          <h3>Settings</h3>
+        {showSettings && <IntialSetting trigger={showSettings} setTrigger={setShowSettings} />}
 
-          <div className="form-group">
-            <label htmlFor="model-provider">Model Provider</label>
-            <select id="model-provider">
-              <option>OpenAI</option>
-              <option>Google</option>
-              <option>Anthropic</option>
-              <option>XAI</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="brave-api">Brave Search API Key</label>
-            <input type="text" id="brave-api" placeholder="Enter API Key" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="proxy-list">Proxy List</label>
-            <textarea id="proxy-list" placeholder="Enter proxies, one per line"></textarea>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="neo4j-url">Neo4j URL</label>
-            <input type="text" id="neo4j-url" placeholder="Enter Neo4j URL" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="neo4j-username">Neo4j Username</label>
-            <input type="text" id="neo4j-username" placeholder="Enter Username" />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="neo4j-password">Neo4j Password</label>
-            <input type="password" id="neo4j-password" placeholder="Enter Password" />
-          </div>
-
-        </div>
-
-        </IntialSetting>
 
       </header>
     </div>
