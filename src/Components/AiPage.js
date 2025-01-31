@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AiPage.css';
 import logo from './settings-gear-1.svg';
 import { FaBars, FaTimes } from 'react-icons/fa'; // For toggle icons
 
 function AiPage() {
-    const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(true);
-    const [isRightSidebarOpen, setRightSidebarOpen] = useState(true);
+    // Load sidebar states from localStorage (default to closed if not set)
+    const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(
+        localStorage.getItem("leftSidebarState") === "true"
+    );
+    const [isRightSidebarOpen, setRightSidebarOpen] = useState(
+        localStorage.getItem("rightSidebarState") === "true"
+    );
+
+    // Effect to update localStorage when state changes
+    useEffect(() => {
+        localStorage.setItem("leftSidebarState", isLeftSidebarOpen);
+    }, [isLeftSidebarOpen]);
+
+    useEffect(() => {
+        localStorage.setItem("rightSidebarState", isRightSidebarOpen);
+    }, [isRightSidebarOpen]);
 
     const toggleLeftSidebar = () => {
         setLeftSidebarOpen(!isLeftSidebarOpen);
@@ -67,14 +81,14 @@ function AiPage() {
 
             {/* Main Content */}
             <main className='main-content'>
-                <div className='logo'>
+                {/* <div className='logo'>
                     <img 
                         src={logo} 
                         className="App-logo" 
                         alt="logo" 
                         style={{ cursor: 'pointer' }}
                     />
-                </div>
+                </div> */}
                 <div className='search-area'>
                     <h1>How can I help you today?</h1>
                     <div className='search-bar'>
@@ -92,53 +106,3 @@ function AiPage() {
 }
 
 export default AiPage;
-
-
-// import React from 'react';
-// import './AiPage.css'
-
-// function AiPage() {
-//     return (
-//         <div className='app-container'>
-//             <nav className='left-side-bar'>
-//                 <div className='logo'>hemangAI</div>
-//                 <button className='new-chat'>New Chat</button>
-//                 <ul className='nav-links'>
-//                     <li>Home</li>
-//                     <li>Search</li>
-//                     <li>Discover</li>
-//                 </ul>
-//                 <div>
-//                     <span>user@123</span>
-//                 </div>
-//             </nav>
-
-//             <nav className='right-side-bar'>
-//                 <ul className='nav-links'>
-//                     <li>What is the weather</li>
-//                     <li>Top 5 Places to live</li>
-//                     <li>Trump Election</li>
-//                 </ul>
-//             </nav>
-
-//             <main className='main-content'>
-//                 <div className='search-area'>
-//                     <h2>How can I help you today?</h2>
-//                     <div className='search-bar'>
-//                         <input
-//                             className='search-input'
-//                             type='text'
-//                             placeholder='Ask anything...' 
-//                         />
-//                         <button className='send-btn'>Send</button>
-//                     </div>
-//                 </div>
-//             </main>
-
-//         </div>
-
-//     )
-
-// }
-
-// export default AiPage;
