@@ -3,14 +3,15 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // import logo from './logo.svg';
 import logo from './settings-gear-2.svg';
 import './App.css';
-import './Components/IntialSetting.js';
 import IntialSetting from './Components/IntialSetting.js';
+import AiPage from './Components/AiPage.js';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/AiPage' element={<AiPage />} />
       </Routes>
     </BrowserRouter>
   );

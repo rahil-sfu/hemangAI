@@ -1,21 +1,45 @@
 import React, { useState } from 'react';
 import './IntialSetting.css';
+import { FaTimes } from 'react-icons/fa';
 
 function IntialSetting(props) {
     const [selectedProvider, setSelectedProvider] = useState("OpenAI");
 
     const modelOptions = {
-        OpenAI: ["GPT-4.0", "GPT-4o"],
-        Google: ["Gemini 2.0", "Gemini 3.0"],
-        Anthropic: ["Claude 2", "Claude 3"],
-        XAI: ["X-Model 1", "X-Model 2"]
+        OpenAI: {
+            "GPT-4 Turbo": "gpt-4-turbo",
+            "GPT-4o": "gpt-4o",
+            "GPT-4o Latest": "gpt-4o-2024-11-20",
+            "GPT-4o Mini": "gpt-4o-mini",
+            "ChatGPT": "chatgpt-4o-latest"
+        },
+        Anthropic: {
+            "Claude 3.5 Sonnet": "claude-3-5-sonnet-20241022",
+            "Claude 3.5 Haiku": "claude-3-5-haiku-20241022",
+            "Claude 3 Opus": "claude-3-opus-20240229",
+            "Claude 3 Sonnet": "claude-3-sonnet-20240229",
+            "Claude 3 Haiku": "claude-3-haiku-20240307"
+        },
+        Google: {
+            "Gemini 1.5 Pro": "gemini-1.5-pro",
+            "Gemini 1.5 Flash": "gemini-1.5-flash",
+            "Gemini 2.0 Flash Experimental": "gemini-2.0-flash-exp",
+            "Gemini Experimental 1206": "gemini-exp-1206"
+        },
+        XAI: {
+            "Grok-2": "grok-2-latest",
+            "Grok Beta": "grok-beta"
+        }
     };
+    
 
     return props.trigger ? (
         <div className="showSetting" onClick={() => props.setTrigger(false)}>
             <div className="showSetting-inner" onClick={(e) => e.stopPropagation()}>
                 <label className="setting-size">Settings</label>
-                <button className="close-btn" onClick={() => props.setTrigger(false)}>Close</button>
+                <button className="close-btn" onClick={() => props.setTrigger(false)}>
+                    <FaTimes />
+                </button>
 
                 <br />
                 <br />
@@ -40,9 +64,9 @@ function IntialSetting(props) {
                 <div className="form-group">
                     <label htmlFor="model-name">Model Name</label>
                     <select id="model-name">
-                        {modelOptions[selectedProvider].map((model) => (
-                            <option key={model} value={model}>
-                                {model}
+                        {Object.entries(modelOptions[selectedProvider]).map(([displayName, backendName]) => (
+                            <option key={backendName} value={backendName}>
+                                {displayName}
                             </option>
                         ))}
                     </select>
