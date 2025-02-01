@@ -1,28 +1,35 @@
-  /* Variables for consistent theming */
+/* Define a modern dark theme */
 :root {
-    --dark-surface: #1c1011;;
-    --primary-color: #464646;
-    --secondary-color: #03dac6;
-    --accent-color: #00bfa5;
-    --text-color: #e0e0e0;
-    --hover-bg: #333333;
+    --dark-surface: #1c1011;
+    --primary-color: #2b2b2b;      /* A dark gray for sidebars and buttons */
+    --secondary-color: #03dac6;    /* A cool teal for accents */
+    --accent-color: #444a89;       /* A warm accent for highlights and borders */
+    --text-color: #e0e0e0;         /* Off-white text */
+    --hover-bg: #3a3a3a;          /* Slightly lighter for hover effects */
     --transition-speed: 0.3s;
-}
-
-.app-container {
-    background: var(--dark-surface);  /* Deep, dark maroon base */
-    color: var(--text-color); /* Soft off-white for contrast */
+  }
+  
+  /* Global font settings */
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: var(--dark-surface);
+  }
+  
+  /* Main container styling */
+  .app-container {
+    background: var(--dark-surface);
+    color: var(--text-color);
     display: flex;
     height: 100vh;
     position: relative;
     overflow: hidden;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Sidebar Common Styles */
-.left-side-bar,
-.right-side-bar {
+  }
+  
+  /* Sidebar common styles */
+  .left-side-bar,
+  .right-side-bar {
     background-color: var(--primary-color);
     color: var(--text-color);
     display: flex;
@@ -30,290 +37,245 @@
     padding: 1rem;
     transition: transform var(--transition-speed) ease-in-out;
     z-index: 1000;
-}
-
-/* Left Sidebar Specific */
-.left-side-bar {
+  }
+  
+  /* Left Sidebar Specific */
+  .left-side-bar {
     width: 240px;
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
-}
-
-.left-side-bar.closed {
+  }
+  
+  .left-side-bar.closed {
     transform: translateX(-100%);
-}
-
-/* Right Sidebar Specific */
-.right-side-bar {
+  }
+  
+  /* Right Sidebar Specific */
+  .right-side-bar {
     width: 240px;
     position: absolute;
     top: 0;
     right: 0;
     height: 100%;
-}
-
-.right-side-bar.closed {
+  }
+  
+  .right-side-bar.closed {
     transform: translateX(100%);
-}
-
-/* Toggle Buttons */
-.toggle-btn {
-    position: absolute;
-    top: 1rem;
+  }
+  
+  /* Toggle Buttons - base style */
+  .toggle-btn {
     background-color: var(--primary-color);
-    color: #fff;
+    color: var(--text-color);
     border: none;
     padding: 0.5rem;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color var(--transition-speed);
     z-index: 1100;
-}
-
-.toggle-btn:hover {
-    background-color: var(--accent-color);
-}
-
-.left-toggle {
-    left: 1rem;
-}
-
-.right-toggle {
-    right: 1rem;
-}
-
-/* Sidebar Headers */
-.sidebar-header {
+  }
+  
+  /* --- Right Toggle Button Custom Styles --- */
+  /* When the right sidebar is closed, display a circular, transparent button centered on the right edge */
+  .toggle-btn.right-toggle {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    padding: 0;
+  }
+  
+  .toggle-btn.right-toggle:hover {
+    background: var(--accent-color);
+    color: var(--dark-surface);
+  }
+  
+  /* Sidebar Headers */
+  .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-}
-
-.sidebar-header .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.sidebar-header h3 {
+  }
+  
+  .sidebar-header h3 {
     margin: 0;
     font-size: 1.2rem;
-}
-
-.close-btn {
+  }
+  
+  /* Close Button inside sidebars */
+  .close-btn {
     background: none;
     border: none;
     color: var(--text-color);
     font-size: 1.2rem;
     cursor: pointer;
     transition: color var(--transition-speed);
-}
-
-.close-btn:hover {
+  }
+  
+  .close-btn:hover {
     color: var(--secondary-color);
-}
-
-/* Navigation Links */
-.nav-links {
+  }
+  
+  /* Navigation Links */
+  .nav-links {
     list-style: none;
     padding: 0;
     margin: 0;
     flex-grow: 1;
-}
-
-.nav-links li {
+  }
+  
+  .nav-links li {
     padding: 0.75rem 1rem;
     margin: 0.5rem 0;
     border-radius: 4px;
     cursor: pointer;
     transition: background var(--transition-speed), color var(--transition-speed);
-}
-
-.nav-links li:hover {
+  }
+  
+  .nav-links li:hover {
     background-color: var(--hover-bg);
     color: var(--secondary-color);
-}
-
-/* New Chat Button */
-.new-chat {
-    background-color: var(--secondary-color);
-    color: #1e1e2f;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 1rem;
-    transition: background-color var(--transition-speed);
-}
-
-.new-chat:hover {
-    background-color: var(--accent-color);
-}
-
-/* User Info */
-.user-info {
-    margin-top: auto;
-    padding: 1rem 0;
-    border-top: 1px solid #333;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #bbb;
-}
-
-/* Main Content */
-.main-content {
+  }
+  
+  /* Main Content */
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* Centers items horizontally */
+    justify-content: center;  /* Centers items vertically */
     flex-grow: 1;
     margin-left: 240px;
     margin-right: 240px;
     padding: 2rem;
     transition: margin var(--transition-speed) ease-in-out;
-}
-
-.left-side-bar.closed ~ .main-content {
-    margin-left: 240px;
-}
-
-.right-side-bar.closed ~ .main-content {
-    margin-right: 240px;
-}
-
-.search-area {
-    background-color: var(--dark-surface);
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.search-area h2 {
+  }
+  
+  
+  /* Additional styling for the search area and buttons */
+  .search-area h1 {
     margin-bottom: 1.5rem;
-    color: var(--text-color);
-}
-
-.search-bar {
     display: flex;
-}
-.search-logo {
-    color: #2c2c3e;
-}
-
-.search-input {
+    flex-direction: column;
+    align-items: center;   /* Centers items horizontally */
+    justify-content: center;  /* Centers items vertically */
+  }
+  
+  .search-area {
+    width: 99%;
+    max-width: 900px; /* Adjust the max width as desired */
+  }
+  
+  /* Ensure the search bar group spans the container's width */
+  .search-bar {
+    display: flex;
+    width: 100%;
+  }
+  
+  /* Settings Button */
+  .settings-btn {
+    background-color: var(--primary-color);
+    border: none;
+    color: var(--text-color);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px 0 0 4px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+  }
+  
+  .settings-btn:hover {
+    background-color: var(--accent-color);
+  }
+  
+  /* Search Input */
+  .search-input {
     flex-grow: 1;
     padding: 0.75rem 1rem;
     border: none;
-    border-radius: 4px 0 0 4px;
+    /* Remove the left border-radius as the settings button provides that */
+    border-radius: 0;
     background-color: #2c2c3e;
     color: var(--text-color);
     font-size: 1rem;
-}
-
-.search-input::placeholder {
+  }
+  
+  .search-input::placeholder {
     color: #888;
-}
-
-.send-btn {
+  }
+  
+  /* Send Button with Icon */
+  .send-btn {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 0 4px 4px 0;
     background-color: var(--primary-color);
-    color: #fff;
+    color: var(--text-color);
     cursor: pointer;
     transition: background-color var(--transition-speed);
-}
-
-.send-btn:hover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .send-btn:hover {
     background-color: var(--accent-color);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
     .left-side-bar,
     .right-side-bar {
-        width: 200px;
+      width: 200px;
     }
-
     .main-content {
-        margin-left: 200px;
-        margin-right: 200px;
+      margin-left: 200px;
+      margin-right: 200px;
     }
-}
-
-@media (max-width: 576px) {
+  }
+  
+  @media (max-width: 576px) {
     .left-side-bar,
     .right-side-bar {
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        right: 0;
-        transform: translateY(-100%);
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(-100%);
     }
-
     .left-side-bar.open,
     .right-side-bar.open {
-        transform: translateY(0);
+      transform: translateY(0);
     }
-
     .main-content {
-        margin: 0;
-        padding: 1rem;
+      margin: 0;
+      padding: 1rem;
     }
-
     .toggle-btn.left-toggle,
     .toggle-btn.right-toggle {
-        top: auto;
-        bottom: 1rem;
+      top: auto;
+      bottom: 1rem;
     }
-
     .left-toggle {
-        left: 1rem;
+      left: 1rem;
     }
-
     .right-toggle {
-        right: 1rem;
+      right: 1rem;
     }
-}
-
-  /* .app-container {
-    background: #180e0f;  
-    color: #F5E6E8;
-
-    display: flex;
-    height: 100vh;
-  }
-  .right-side-bar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 240px;
-    background-color: var(--dark-surface);
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-  }
-  .left-side-bar {
-    top: 0;
-    left: 0;
-    width: 240px;
-    background-color: var(--dark-surface);
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-  }
-
-  .nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
   }
   
-  .nav-links li {
-    padding: 0.5rem 0;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .nav-links li:hover {
-    background-color: #333333;
-  } */
