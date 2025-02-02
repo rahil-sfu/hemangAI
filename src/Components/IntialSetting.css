@@ -53,11 +53,17 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: #ff4d4d;
+  background: none;
   color: white;
   padding: 9px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+/* Close button hover effect */
+.showSetting-inner .close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 /* Ensure the title stays at the top */
@@ -71,7 +77,7 @@
 
 /* Form groups styling */
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -80,6 +86,17 @@
 .form-group label {
   font-size: large;
   margin-bottom: 5px;
+}
+
+.sliders-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px; /* Adjust the gap as needed */
+  align-items: center;
+}
+
+.slider-item {
+  flex: 1;
 }
 
 input, select, textarea {
