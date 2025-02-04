@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './AiPage.css';
 import logo from './settings-gear-1.svg';
-import { FaTimes, FaChevronLeft, FaCog, FaPaperPlane } from 'react-icons/fa'; 
+import { FaTimes, FaChevronLeft, FaCog, FaPaperPlane } from 'react-icons/fa';
 import { BsChevronLeft } from "react-icons/bs";
-
+import IntialSetting from './IntialSetting'; // Import the settings modal component
 
 function AiPage() {
-  // Load sidebar states from localStorage (default to closed if not set)
   const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(
     localStorage.getItem("leftSidebarState") === "true"
   );
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(
     localStorage.getItem("rightSidebarState") === "true"
   );
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(240);
+  const minWidth = 200;
+  const maxWidth = 400;
+  const [searchText, setSearchText] = useState("");
+  const textAreaRef = useRef(null);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // Update localStorage when sidebar states change
   useEffect(() => {
     localStorage.setItem("leftSidebarState", isLeftSidebarOpen);
   }, [isLeftSidebarOpen]);
@@ -22,6 +26,14 @@ function AiPage() {
   useEffect(() => {
     localStorage.setItem("rightSidebarState", isRightSidebarOpen);
   }, [isRightSidebarOpen]);
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      const newHeight = Math.min(textAreaRef.current.scrollHeight, 200);
+      textAreaRef.current.style.height = newHeight + "px";
+    }
+  }, [searchText]);
 
   const toggleLeftSidebar = () => {
     setLeftSidebarOpen(!isLeftSidebarOpen);
@@ -31,22 +43,42 @@ function AiPage() {
     setRightSidebarOpen(!isRightSidebarOpen);
   };
 
+  const startResize = (e) => {
+    e.preventDefault();
+    document.addEventListener("mousemove", resizeSidebar);
+    document.addEventListener("mouseup", stopResize);
+  };
+
+  const resizeSidebar = (e) => {
+    let newWidth = window.innerWidth - e.clientX;
+    if (newWidth < minWidth) newWidth = minWidth;
+    if (newWidth > maxWidth) newWidth = maxWidth;
+    setRightSidebarWidth(newWidth);
+  };
+
+  const stopResize = () => {
+    document.removeEventListener("mousemove", resizeSidebar);
+    document.removeEventListener("mouseup", stopResize);
+  };
+
   return (
     <div className='app-container'>
       {/*
-      Left sidebar code (if needed) – currently commented out 
-      <nav className={`left-side-bar ${isLeftSidebarOpen ? 'open' : 'closed'}`}>
-          ...
-      </nav>
-      {!isLeftSidebarOpen && (
-          <button className='toggle-btn left-toggle' onClick={toggleLeftSidebar}>
-              <FaBars />
-          </button>
-      )} 
+        Left sidebar code (if needed) – currently commented out 
+        <nav className={`left-side-bar ${isLeftSidebarOpen ? 'open' : 'closed'}`}>
+            ...
+        </nav>
+        {!isLeftSidebarOpen && (
+            <button className='toggle-btn left-toggle' onClick={toggleLeftSidebar}>
+                <FaBars />
+            </button>
+        )} 
       */}
-
-      {/* Right Sidebar */}
-      <nav className={`right-side-bar ${isRightSidebarOpen ? 'open' : 'closed'}`}>
+      
+      <nav
+        className={`right-side-bar ${isRightSidebarOpen ? 'open' : 'closed'}`}
+        style={{ width: isRightSidebarOpen ? rightSidebarWidth : undefined }}
+      >
         <div className='sidebar-header'>
           <h3>Quick Actions</h3>
           <button className='close-btn' onClick={toggleRightSidebar}>
@@ -58,38 +90,43 @@ function AiPage() {
           <li>Top 5 Places to live</li>
           <li>Trump Election</li>
         </ul>
+        <div className="resizer" onMouseDown={startResize}></div>
       </nav>
 
-      {/* Right Sidebar Toggle Button (only visible when the right sidebar is closed) */}
       {!isRightSidebarOpen && (
         <button className='toggle-btn right-toggle' onClick={toggleRightSidebar}>
           <BsChevronLeft />
         </button>
       )}
 
-      {/* Main Content */}
       <main className='main-content'>
         <div className='search-area'>
           <h1>How can I help you today?</h1>
           <div className='search-bar'>
-            {/* Settings Button */}
-            <button className='settings-btn'>
-              <FaCog />
-            </button>
-
-            {/* Search Input */}
-            <input
-              className='search-input'
-              type='text'
-              placeholder='Ask anything...'
-            />
-            {/* Send Button with Icon */}
-            <button className='send-btn'>
-              <FaPaperPlane />
-            </button>
+            <div className="search-input-wrapper">
+              <textarea
+                className='search-input'
+                placeholder='Ask anything...'
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                ref={textAreaRef}
+              />
+            </div>
+            <div className="icon-container">
+              <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                <FaCog />
+              </button>
+              <button className='send-btn'>
+                <FaPaperPlane />
+              </button>
+            </div>
           </div>
         </div>
       </main>
+      
+      {showSettingsModal && (
+        <IntialSetting trigger={true} setTrigger={() => setShowSettingsModal(false)} />
+      )}
     </div>
   );
 }
