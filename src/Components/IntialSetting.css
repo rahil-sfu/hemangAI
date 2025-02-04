@@ -55,7 +55,7 @@
   right: 16px;
   background: none;
   color: white;
-  padding: 9px;
+  padding: 7px;
   border-radius: 5px;
   cursor: pointer;
 }
@@ -90,13 +90,36 @@
 
 .sliders-container {
   display: flex;
-  flex-direction: row;
-  gap: 20px; /* Adjust the gap as needed */
-  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  width: 100%;
 }
 
 .slider-item {
-  flex: 1;
+  flex: 1; /* Each slider item will take up equal available space */
+  width: 100%;
+}
+
+/* Container for password input and icon */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Style the input to have extra padding on the right so text doesn’t run under the icon */
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* Adjust based on the icon size */
+}
+
+/* Position the icon absolutely */
+.password-toggle {
+  position: absolute;
+  left: 46.5%;  /* Adjust as needed */
+  transform: translateY(-145%);
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 input, select, textarea {
