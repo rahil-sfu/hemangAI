@@ -266,22 +266,25 @@ function IntialSetting(props) {
           </div>
           <div className="form-group">
             <label htmlFor="neo4j-password">Neo4j Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="neo4j-password"
-              name="neo4j-password"
-              placeholder="Enter Password"
-              style={{ flex: 1 }}
-            />
-            <IconButton 
-              onClick={() => setShowPassword(prev => !prev)}
-              sx={{
-                transform: 'translateY(-100%) translateX(1835%)',
-                color: 'white'
-              }}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </IconButton>
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="neo4j-password"
+                name="neo4j-password"
+                placeholder="Enter Password"
+              />
+              <IconButton 
+                onClick={() => setShowPassword(prev => !prev)}
+                className="password-toggle"
+                sx={{ 
+                  color: "white",  // Change the color of the icon
+                  p: 0,           // Remove internal padding
+                  m: 0            // Remove any margin
+                }}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </IconButton>
+            </div>
           </div>
 
           {/* Model Temperature and Top-P */}
@@ -297,7 +300,7 @@ function IntialSetting(props) {
                   min={0.0}
                   max={1.0}
                   valueLabelDisplay="auto"
-                  sx={{ width: 350, color: 'success.main' }}
+                  sx={{ width: '100%', color: 'success.main' }}
                 />
               </div>
               <div className="slider-item">
@@ -310,7 +313,7 @@ function IntialSetting(props) {
                   min={0.0}
                   max={1.0}
                   valueLabelDisplay="auto"
-                  sx={{ width: 350, color: 'success.main' }}
+                  sx={{ width: '100%', color: 'success.main' }}
                 />
               </div>
             </div>
