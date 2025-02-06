@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
-import logo from './settings-gear-2.svg';
+import logo from './Icons/settings-2.svg';
 import './App.css';
 import IntialSetting from './Components/IntialSetting.js';
 import AiPage from './Components/AiPage.js';
-
-import ChatWindow from './Components/AiComponents/ChatWindow.js'
 
 function App() {
   return (

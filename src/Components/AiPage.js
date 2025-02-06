@@ -1,9 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './AiPage.css';
-import logo from './settings-gear-1.svg';
+
+import settingsLogo from '../Icons/settings-2.svg';
+import botLogo from '../Icons/bot.png';
+import copyLogo from '../Icons/copy.png';
+import evaluteLogo from '../Icons/evaluate.png';
+import graphLogo from '../Icons/graph.png';
+import reprocess from '../Icons/reprocess.png';
+import sources from '../Icons/sources.png';
+import user from '../Icons/user.png';
+
 import { FaTimes, FaChevronLeft, FaCog, FaPaperPlane } from 'react-icons/fa';
-import { BsChevronLeft } from "react-icons/bs";
+import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import IntialSetting from './IntialSetting';
+import ChatWindow from './AiComponents/ChatWindow';
+import LeftSideBar from './AiComponents/LeftSideBar';
 
 function AiPage() {
   const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(
@@ -18,6 +29,9 @@ function AiPage() {
   const [searchText, setSearchText] = useState("");
   const textAreaRef = useRef(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // State to track if the ChatWindow is shown
+  const [showChatWindow, setShowChatWindow] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("leftSidebarState", isLeftSidebarOpen);
@@ -121,19 +135,30 @@ function AiPage() {
     }
   };
 
+  // When the send button is pressed:
+  const handleSendButtonClick = () => {
+    // Optionally process searchText here if needed
+    setShowChatWindow(true);
+  };
+
   return (
     <div className='app-container'>
-      {/*
-        Left sidebar code (if needed) – currently commented out 
         <nav className={`left-side-bar ${isLeftSidebarOpen ? 'open' : 'closed'}`}>
-            ...
-        </nav>
-        {!isLeftSidebarOpen && (
-            <button className='toggle-btn left-toggle' onClick={toggleLeftSidebar}>
-                <FaBars />
+          <div className='sidebar-header'>
+            <h3>Sources</h3>
+            <button className='close-btn' onClick={toggleLeftSidebar}>
+              <FaTimes />
             </button>
-        )} 
-      */}
+          </div>
+          <LeftSideBar />
+
+        </nav>
+        {/* {!isLeftSidebarOpen && (
+            <button className='toggle-btn left-toggle' onClick={toggleLeftSidebar}>
+                <BsChevronRight />
+            </button>
+        )}  */}
+     
       
       <nav
         className={`right-side-bar ${isRightSidebarOpen ? 'open' : 'closed'}`}
@@ -159,47 +184,71 @@ function AiPage() {
         </button>
       )}
 
-      <main 
-        className='main-content'
-        style={{
-          marginRight: isRightSidebarOpen ? rightSidebarWidth : 0
-        }}
-      >
-        <div className='search-area'>
-          <h1>How can I help you today?</h1>
-          <div className='search-bar'>
-            <div className="search-input-wrapper">
-              <textarea
-                rows="1"
-                className='search-input'
-                placeholder='Ask anything...'
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                ref={textAreaRef}
+      <main className='main-content'>
+        {showChatWindow ? (
+          // Chat mode: ChatWindow on top and the search bar fixed at the bottom
+          <>
+            <div className="chat-container" style={{ flexGrow: 1 }}>
+              <ChatWindow 
+                openRightSidebar={() => setRightSidebarOpen(true)} 
+                openLeftSidebar={() => setLeftSidebarOpen(true)} 
               />
             </div>
-            <div className="icon-container">
-              <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
-                <FaCog />
-              </button>
-              <button 
-                className='send-btn'
-                onClick={handleSend}
-              >
-                <FaPaperPlane />
-              </button>
+            <div className="search-bar search-bar-fixed">
+              <div className="search-input-wrapper">
+                <textarea
+                  className='search-input'
+                  placeholder='Ask follow-up'
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  ref={textAreaRef}
+                />  
+              </div>
+              <div className="icon-container">
+                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                  <FaCog />
+                </button>
+                <button 
+                  className='send-btn'
+                  onClick={handleSendButtonClick}
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          // Initial mode: Show header and centered search bar
+          <div className='search-area'>
+            <h1>How can I help you today?</h1>
+            <div className='search-bar'>
+              <div className="search-input-wrapper">
+                <textarea
+                  className='search-input'
+                  placeholder='Ask anything...'
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  ref={textAreaRef}
+                />
+              </div>
+              <div className="icon-container">
+                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                  <FaCog />
+                </button>
+                <button 
+                  className='send-btn'
+                  onClick={handleSendButtonClick}
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
       
       {showSettingsModal && (
-        <IntialSetting 
-          trigger={true} 
-          setTrigger={() => setShowSettingsModal(false)} 
-          fromAiPage={true}
-        />
+        <IntialSetting trigger={true} setTrigger={() => setShowSettingsModal(false)} />
       )}
     </div>
   );

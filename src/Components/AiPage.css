@@ -42,7 +42,7 @@ body {
 
 /* Left Sidebar Specific */
 .left-side-bar {
-  width: 240px;
+  /* width: 240px; */
   top: 0;
   left: 0;
   height: 100%;
@@ -164,11 +164,15 @@ body {
 .main-content {
   display: flex;
   flex-direction: column;
-  align-items: center;   /* Centers items horizontally */
+  align-items: center;  /*  Centers items horizontally */
   justify-content: center;  /* Centers items vertically */
   flex-grow: 1;
   padding: 2rem;
   transition: 0.1s;
+
+  width: 99%;
+  max-width: 800px;
+  margin: 0 auto;;
 }
 
 /* Search Area */
@@ -184,6 +188,7 @@ body {
   width: 99%;
   max-width: 800px; /* Adjust the max width as desired */
 }
+
 
 /* --- Search Bar Styling --- */
 .search-bar {

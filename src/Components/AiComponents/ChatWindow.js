@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import './ChatWindow.css';
 import { FaUser, FaBilibili, FaSistrix, FaRegClone, FaLink } from "react-icons/fa6";
 
-function ChatWindow({ openRightSidebar }) {
+function ChatWindow({ openRightSidebar, openLeftSidebar }) {
   // Create a ref for the answer paragraph so we can copy its text.
   const answerRef = useRef(null);
 
@@ -67,9 +67,13 @@ function ChatWindow({ openRightSidebar }) {
               <div className="icon" onClick={openRightSidebar}>
                 <FaSistrix />
               </div>
-              <div className="icon">
+
+              <div className="icon" onClick={() => { 
+                openLeftSidebar(); 
+              }}>
                 <FaLink />
               </div>
+
             </div>
           </div>
         </div>
