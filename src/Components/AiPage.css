@@ -6,7 +6,7 @@
   --accent-color: #444a89;        /* A warm accent for highlights and borders */
   --text-color: #e0e0e0;          /* Off-white text */
   --hover-bg: #3a3a3a;           /* Slightly lighter for hover effects */
-  --transition-speed: 0.3s;
+  --transition-speed: 0.25s;        /* Speed of transitions */
 }
 
 /* Global font settings */
@@ -16,19 +16,6 @@ body {
   padding: 0;
   background: var(--dark-surface);
 }
-
-/* For the search bar in chat mode at the bottom */
-.search-bar-fixed {
-  position: sticky;
-  bottom: 0;
-  background-color: #21212f; /* Ensure it matches your theme */
-  padding: 0.5rem;
-  border-top: 1px solid var(--accent-color);
-  display: flex;
-  align-items: center;
-  z-index: 10;
-}
-
 
 /* Main container styling */
 .app-container {
@@ -48,7 +35,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  transition: transform var(--transition-speed) ease-in-out;
+  transition: transform var(--transition-speed);
   z-index: 1000;
   position: absolute;
 }
@@ -180,10 +167,8 @@ body {
   align-items: center;   /* Centers items horizontally */
   justify-content: center;  /* Centers items vertically */
   flex-grow: 1;
-  margin-left: 240px;
-  margin-right: 240px;
   padding: 2rem;
-  transition: margin var(--transition-speed) ease-in-out;
+  transition: 0.1s;
 }
 
 /* Search Area */
@@ -210,21 +195,20 @@ body {
 
 /* Search Input Wrapper */
 .search-input-wrapper {
-  padding: 0.5rem 0.6rem 3rem 0.6rem;
+  padding: 0.25rem 0.6rem 3.75rem 0.6rem;
 }
 
 /* Search Input Field */
 .search-input {
   width: 100%;
-  min-height: 4rem;
   max-height: 200px;
-  overflow: hidden;
+  overflow-y: auto;
   resize: none;
   font-size: 1.2rem;
   border: none;
   background-color: transparent;
   color: var(--text-color);
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 /* Search Input Field Focus */
@@ -272,7 +256,7 @@ body {
 /* Button Icons */
 .settings-btn svg,
 .send-btn svg {
-  font-size: 1.25rem;
+  font-size: 1.45rem;
 }
 
 /* Hover style for icon buttons */
