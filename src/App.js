@@ -14,7 +14,6 @@ function App() {
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/AiPage' element={<AiPage />} />
-        <Route path='/ChatWindow' element={<ChatWindow />} />
       </Routes>
     </BrowserRouter>
   );
