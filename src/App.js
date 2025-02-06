@@ -6,12 +6,15 @@ import './App.css';
 import IntialSetting from './Components/IntialSetting.js';
 import AiPage from './Components/AiPage.js';
 
+import ChatWindow from './Components/AiComponents/ChatWindow.js'
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/AiPage' element={<AiPage />} />
+        <Route path='/ChatWindow' element={<ChatWindow />} />
       </Routes>
     </BrowserRouter>
   );

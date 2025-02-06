@@ -17,6 +17,19 @@ body {
   background: var(--dark-surface);
 }
 
+/* For the search bar in chat mode at the bottom */
+.search-bar-fixed {
+  position: sticky;
+  bottom: 0;
+  background-color: #21212f; /* Ensure it matches your theme */
+  padding: 0.5rem;
+  border-top: 1px solid var(--accent-color);
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+
 /* Main container styling */
 .app-container {
   background: var(--dark-surface);

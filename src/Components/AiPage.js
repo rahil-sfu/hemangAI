@@ -3,7 +3,9 @@ import './AiPage.css';
 import logo from './settings-gear-1.svg';
 import { FaTimes, FaChevronLeft, FaCog, FaPaperPlane } from 'react-icons/fa';
 import { BsChevronLeft } from "react-icons/bs";
+
 import IntialSetting from './IntialSetting'; // Import the settings modal component
+import ChatWindow from './AiComponents/ChatWindow'; // Import the ChatWindow component
 
 function AiPage() {
   const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(
@@ -18,6 +20,8 @@ function AiPage() {
   const [searchText, setSearchText] = useState("");
   const textAreaRef = useRef(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  // State to track if the ChatWindow is shown
+  const [showChatWindow, setShowChatWindow] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("leftSidebarState", isLeftSidebarOpen);
@@ -61,6 +65,12 @@ function AiPage() {
     document.removeEventListener("mouseup", stopResize);
   };
 
+  // When the send button is pressed:
+  const handleSendButtonClick = () => {
+    // Optionally process searchText here if needed
+    setShowChatWindow(true);
+  };
+
   return (
     <div className='app-container'>
       {/*
@@ -100,28 +110,63 @@ function AiPage() {
       )}
 
       <main className='main-content'>
-        <div className='search-area'>
-          <h1>How can I help you today?</h1>
-          <div className='search-bar'>
-            <div className="search-input-wrapper">
-              <textarea
-                className='search-input'
-                placeholder='Ask anything...'
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                ref={textAreaRef}
-              />
+        {showChatWindow ? (
+          // Chat mode: ChatWindow on top and the search bar fixed at the bottom
+          <>
+            <div className="chat-container" style={{ flexGrow: 1 }}>
+              <ChatWindow openRightSidebar={() => setRightSidebarOpen(true)} />
             </div>
-            <div className="icon-container">
-              <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
-                <FaCog />
-              </button>
-              <button className='send-btn'>
-                <FaPaperPlane />
-              </button>
+            <div className="search-bar search-bar-fixed">
+              <div className="search-input-wrapper">
+                <textarea
+                  className='search-input'
+                  placeholder='Ask follow-up'
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  ref={textAreaRef}
+                />  
+              </div>
+              <div className="icon-container">
+                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                  <FaCog />
+                </button>
+                <button 
+                  className='send-btn'
+                  onClick={handleSendButtonClick}
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          // Initial mode: Show header and centered search bar
+          <div className='search-area'>
+            <h1>How can I help you today?</h1>
+            <div className='search-bar'>
+              <div className="search-input-wrapper">
+                <textarea
+                  className='search-input'
+                  placeholder='Ask anything...'
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  ref={textAreaRef}
+                />
+              </div>
+              <div className="icon-container">
+                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                  <FaCog />
+                </button>
+                <button 
+                  className='send-btn'
+                  onClick={handleSendButtonClick}
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
       
       {showSettingsModal && (
