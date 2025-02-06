@@ -20,7 +20,7 @@ function IntialSetting(props) {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "success", // "success" or "error"
+    severity: "success", // "success", "error", "info", "warning"
   });
 
   // Ref for the form element
@@ -68,7 +68,7 @@ function IntialSetting(props) {
     setModelTopP(1.0);
   };
 
-  // Snackbar close handler (ignores "clickaway" so that error notifications require explicit close)
+  // Snackbar close handler
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') return;
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -111,18 +111,6 @@ function IntialSetting(props) {
       return;
     }
 
-    // Show the success notification (auto-hides after 3 seconds)
-    setSnackbar({
-      open: true,
-      message: "Settings saved successfully!",
-      severity: "success",
-    });
-
-    // Call the parent's callback to change the underlying page's content (spinner/text)
-    if (props.onInitializationStart) {
-      props.onInitializationStart();
-    }
-
     // Build the JSON payload
     const payload = {
       "Model_Provider": modelProvider.toLowerCase(),
@@ -141,6 +129,31 @@ function IntialSetting(props) {
       payload["Proxy_List"] = proxyList;
     }
 
+    // If opened from AiPage, show "Re-applying settings..." info notification with spinner
+    if (props.fromAiPage) {
+      setSnackbar({
+        open: true,
+        message: (
+          <span>
+            Re-applying settings. This may take a few minutes...
+          </span>
+        ),
+        severity: "info",
+      });
+    } else {
+      // Original immediate success notification if opened from Home/App
+      setSnackbar({
+        open: true,
+        message: "Settings saved successfully!",
+        severity: "success",
+      });
+
+      // Call the parent's callback to change the underlying page's content (spinner/text)
+      if (props.onInitializationStart) {
+        props.onInitializationStart();
+      }
+    }
+
     // Send the payload to the backend
     try {
       const response = await fetch("http://127.0.0.1:8000/settings", {
@@ -150,11 +163,27 @@ function IntialSetting(props) {
         },
         body: JSON.stringify(payload),
       });
+
       if (response.ok) {
         const data = await response.json();
         // When the backend returns {"success": true}, navigate to /AiPage
         if (data.success === true) {
+          // If from AiPage, show the final "Settings saved successfully!" success notification
+          if (props.fromAiPage) {
+            setSnackbar({
+              open: true,
+              message: "Settings saved successfully!",
+              severity: "success",
+            });
+          }
           navigate("/AiPage");
+        } else {
+          // If the response is OK but success is not true
+          setSnackbar({
+            open: true,
+            message: "Error saving settings. Please try again.",
+            severity: "error",
+          });
         }
       } else {
         // If response is not OK, display error notification
@@ -182,7 +211,6 @@ function IntialSetting(props) {
         <button className="close-btn" onClick={() => props.setTrigger(false)}>
           <FaTimes />
         </button>
-        <br /><br />
         <form ref={formRef}>
 
           {/* Model Provider Selection */}
@@ -321,10 +349,21 @@ function IntialSetting(props) {
 
           {/* Buttons */}
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
-            <Button type="button" className="reset-btn" sx={{ color: "#2196f3" }} onClick={handleReset}>
+            <Button 
+              type="button" 
+              className="reset-btn" 
+              sx={{ color: "#2196f3" }} 
+              onClick={handleReset}
+            >
               Reset
             </Button>
-            <Button type="button" variant="contained" color="success" className="save-btn" onClick={handleSave}>
+            <Button 
+              type="button" 
+              variant="contained" 
+              color="success" 
+              className="save-btn" 
+              onClick={handleSave}
+            >
               Save
             </Button>
           </Stack>
