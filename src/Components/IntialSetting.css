@@ -42,10 +42,12 @@
   background: #555; /* Lighter on hover */
 }
 
-/* For Firefox */
+/* Setting inner container */
 .showSetting-inner {
+  position: relative;
   scrollbar-color: #444 #2a2a2a; /* Scrollbar thumb and track */
   scrollbar-width: thin;
+  padding-top: 4.5rem;
 }
 
 /* Ensure the close button stays fixed */
@@ -70,7 +72,7 @@
 .showSetting-inner .setting-size {
   position: absolute;
   font-weight: bold;
-  font-size: 1.25em;
+  font-size: 1.5rem;
   top: 16px;
   left: 16px;
 }
@@ -112,14 +114,17 @@
   padding-right: 40px; /* Adjust based on the icon size */
 }
 
-/* Position the icon absolutely */
-.password-toggle {
-  position: absolute;
-  left: 46.5%;  /* Adjust as needed */
-  transform: translateY(-145%);
-  background: none;
-  border: none;
-  cursor: pointer;
+.password-wrapper .password-toggle {
+  position: absolute !important;
+  color: #DDD;
+  top: 50% !important;
+  left: 95% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Slider styling */
+.slider-item {
+  text-align: center;
 }
 
 input, select, textarea {

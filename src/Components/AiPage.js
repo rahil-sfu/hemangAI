@@ -3,9 +3,7 @@ import './AiPage.css';
 import logo from './settings-gear-1.svg';
 import { FaTimes, FaChevronLeft, FaCog, FaPaperPlane } from 'react-icons/fa';
 import { BsChevronLeft } from "react-icons/bs";
-
-import IntialSetting from './IntialSetting'; // Import the settings modal component
-import ChatWindow from './AiComponents/ChatWindow'; // Import the ChatWindow component
+import IntialSetting from './IntialSetting';
 
 function AiPage() {
   const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(
@@ -14,14 +12,12 @@ function AiPage() {
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(
     localStorage.getItem("rightSidebarState") === "true"
   );
-  const [rightSidebarWidth, setRightSidebarWidth] = useState(240);
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(300);
   const minWidth = 200;
-  const maxWidth = 400;
+  const maxWidth = 450;
   const [searchText, setSearchText] = useState("");
   const textAreaRef = useRef(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  // State to track if the ChatWindow is shown
-  const [showChatWindow, setShowChatWindow] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("leftSidebarState", isLeftSidebarOpen);
@@ -31,11 +27,24 @@ function AiPage() {
     localStorage.setItem("rightSidebarState", isRightSidebarOpen);
   }, [isRightSidebarOpen]);
 
+  // Dynamically resize the text area
   useEffect(() => {
     if (textAreaRef.current) {
+      // Reset height to auto so we can recalc proper scrollHeight
       textAreaRef.current.style.height = "auto";
-      const newHeight = Math.min(textAreaRef.current.scrollHeight, 200);
-      textAreaRef.current.style.height = newHeight + "px";
+      // Force no scrolling until we decide we need it
+      textAreaRef.current.style.overflowY = "hidden";
+
+      // Now calculate the new height
+      const newHeight = textAreaRef.current.scrollHeight;
+
+      // If it exceeds 200px, clamp to 200px and show scrollbar
+      if (newHeight > 200) {
+        textAreaRef.current.style.height = "200px";
+        textAreaRef.current.style.overflowY = "auto";
+      } else {
+        textAreaRef.current.style.height = `${newHeight}px`;
+      }
     }
   }, [searchText]);
 
@@ -65,10 +74,51 @@ function AiPage() {
     document.removeEventListener("mouseup", stopResize);
   };
 
-  // When the send button is pressed:
-  const handleSendButtonClick = () => {
-    // Optionally process searchText here if needed
-    setShowChatWindow(true);
+  /* 
+  Handle sending the message. This function will be called on:
+    1) Click on send icon.
+    2) Pressing Enter (without Shift) in the text area. 
+  */
+  const handleSend = async () => {
+    if (!searchText.trim()) return;
+    try {
+      // Construct the GET request with query param
+      const endpoint = `http://127.0.0.1:8000/message-sse?user_message=${encodeURIComponent(searchText)}`;
+      
+      // Send GET request
+      const response = await fetch(endpoint, {
+        method: 'GET',
+      });
+      if (!response.ok) {
+        console.error("Network response was not ok:", response.statusText);
+      }
+      // Handle the response here
+      // const data = await response.text();
+      // console.log("Response from server:", data);
+
+      // Clear the input after sending
+      setSearchText("");
+
+    } catch (error) {
+      console.error("Error while sending message:", error);
+    }
+  };
+
+  /* 
+  Handle key presses within the text area:- 
+  1. Enter without Shift => Send message 
+  2. Shift+Enter => New line 
+  */
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      // Check if SHIFT is pressed
+      if (!e.shiftKey) {
+        // Prevent default newline
+        e.preventDefault();
+        handleSend();
+      }
+      // if SHIFT is pressed, allow the default => new line
+    }
   };
 
   return (
@@ -109,68 +159,47 @@ function AiPage() {
         </button>
       )}
 
-      <main className='main-content'>
-        {showChatWindow ? (
-          // Chat mode: ChatWindow on top and the search bar fixed at the bottom
-          <>
-            <div className="chat-container" style={{ flexGrow: 1 }}>
-              <ChatWindow openRightSidebar={() => setRightSidebarOpen(true)} />
+      <main 
+        className='main-content'
+        style={{
+          marginRight: isRightSidebarOpen ? rightSidebarWidth : 0
+        }}
+      >
+        <div className='search-area'>
+          <h1>How can I help you today?</h1>
+          <div className='search-bar'>
+            <div className="search-input-wrapper">
+              <textarea
+                rows="1"
+                className='search-input'
+                placeholder='Ask anything...'
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                ref={textAreaRef}
+              />
             </div>
-            <div className="search-bar search-bar-fixed">
-              <div className="search-input-wrapper">
-                <textarea
-                  className='search-input'
-                  placeholder='Ask follow-up'
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  ref={textAreaRef}
-                />  
-              </div>
-              <div className="icon-container">
-                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
-                  <FaCog />
-                </button>
-                <button 
-                  className='send-btn'
-                  onClick={handleSendButtonClick}
-                >
-                  <FaPaperPlane />
-                </button>
-              </div>
-            </div>
-          </>
-        ) : (
-          // Initial mode: Show header and centered search bar
-          <div className='search-area'>
-            <h1>How can I help you today?</h1>
-            <div className='search-bar'>
-              <div className="search-input-wrapper">
-                <textarea
-                  className='search-input'
-                  placeholder='Ask anything...'
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  ref={textAreaRef}
-                />
-              </div>
-              <div className="icon-container">
-                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
-                  <FaCog />
-                </button>
-                <button 
-                  className='send-btn'
-                  onClick={handleSendButtonClick}
-                >
-                  <FaPaperPlane />
-                </button>
-              </div>
+            <div className="icon-container">
+              <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                <FaCog />
+              </button>
+              <button 
+                className='send-btn'
+                onClick={handleSend}
+              >
+                <FaPaperPlane />
+              </button>
             </div>
           </div>
-        )}
+        </div>
       </main>
       
       {showSettingsModal && (
-        <IntialSetting trigger={true} setTrigger={() => setShowSettingsModal(false)} />
+        <IntialSetting 
+          trigger={true} 
+          setTrigger={() => setShowSettingsModal(false)} 
+          fromAiPage={true}
+        />
       )}
     </div>
   );
