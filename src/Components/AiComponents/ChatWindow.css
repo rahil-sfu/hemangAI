@@ -1,117 +1,169 @@
 :root {
-    --dark-surface:  #190e10;       /* Deep, dark maroon base */
-    --primary-color: #2b2b2b;       /* A dark gray for sidebars and buttons */
-    --secondary-color: #03dac6;     /* A cool teal for accents */
-    --accent-color: #aaabb9;        /* A warm accent for highlights and borders */
-    --text-color: #e0e0e0;          /* Off-white text */
-    --hover-bg: #3a3a3a;           /* Slightly lighter for hover effects */
-    --transition-speed: 0.3s;
-  }
+  --dark-surface:  #190e10;       /* Deep, dark maroon base */
+  --primary-color: #2b2b2b;       /* A dark gray for sidebars and buttons */
+  --secondary-color: #03dac6;     /* A cool teal for accents */
+  --accent-color: #aaabb9;        /* A warm accent for highlights and borders */
+  --text-color: #e0e0e0;          /* Off-white text */
+  --hover-bg: #3a3a3a;           /* Slightly lighter for hover effects */
+  --transition-speed: 0.3s;
+}
 
+/* Container for the messages */
+.answer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
 
-/* Horizontal rule styling */
+/* Common message row styling */
+.message-row {
+  display: flex;
+  align-items: flex-start;
+}
 
-.hr-line {
-    border-top: 1px solid var(--accent-color);
-    margin: 1rem 0;
-  }
-  
-  /* Container for the messages */
-  .answer-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
-  }
-  
-  /* Common message row styling */
-  .message-row {
-    display: flex;
-    align-items: flex-start;
-  }
-  
-  /* ----------------- User Message Styling ----------------- */
-  /* User message row: bubble on the left, icon on the right */
-  .user-message {
-    justify-content: flex-end;
-  }
-  
-  .user-message .message-bubble {
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border-radius: 1rem;
-    padding: 0.5rem 1rem;  /* reduced vertical padding */
-    max-width: 70%;
-    text-align: right;
-  }
-  
-  .user-message .user-icon {
-    margin-left: 0.5rem;
-    font-size: 1.5rem;
-    color: var(--secondary-color);
-  }
-  
-  /* ----------------- Bot Message Styling ----------------- */
-  /* Bot message row: icon on the left, and container holding bubble + post-icons on the right */
-  .bot-message {
-    justify-content: flex-start;
-  }
-  
-  .bot-message .bot-icon {
-    margin-right: 0.5rem;
-    font-size: 1.5rem;
-    color: var(--secondary-color);
-  }
-  
-  /* Container for the bot bubble and its post-icons */
-  .bot-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  /* Bot message bubble styling */
-  .bot-container .message-bubble {
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border-radius: 1rem;
-    padding: 0.5rem 1rem;  /* reduced vertical padding */
-    max-width: 70%;
-    text-align: left;
-  }
-  
-  /* ----------------- Additional Styling ----------------- */
-  
-  /* Styling for the "Thought for 3 seconds..." line */
-  .thought {
-    font-style: italic;
-    color: var(--accent-color);
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Styling for the answer text */
-  .answer {
-    margin: 0;
-    line-height: 1.4;
-  }
-  
-  /* Post-answer icons container: placed below the bot bubble */
-  .post-icons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
-  }
-  
-  /* Individual post icon styling */
-  .post-icons .icon {
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--accent-color);
-  }
-  
-  /* Styling for the question text */
-  .question {
-    margin: 0;
-    line-height: 1.4;
-  }
-  
+/* ----------------- User Message Styling ----------------- */
+/* User message row: bubble on the left, icon on the right */
+.user-message {
+  justify-content: flex-end;
+}
+
+.user-message .message-bubble {
+  background-color: #FF8C00;
+  color: #ffffff;
+  border-radius: 0.35rem;
+  padding: 0.5rem 1rem;
+  max-width: 70%;
+  text-align: right;
+}
+
+.user-message .user-icon {
+  margin-top: 0.1rem;
+  margin-left: 0.5rem;
+}
+
+/* ----------------- Bot Message Styling ----------------- */
+/* Bot message row */
+.bot-message {
+  justify-content: flex-start;
+}
+
+.bot-message .bot-icon {
+  position: relative;
+  margin-top: 5.85rem;
+  margin-right: 0.5rem;
+}
+
+/* Container for the bot bubble and its post-icons */
+.bot-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+}
+
+/* Bot message bubble styling */
+.bot-container .message-bubble {
+  background-color: none;
+  color: var(--text-color);
+  padding: 0.25rem 1.15rem 1rem 0.1rem;
+  max-width: 97%;
+  text-align: left;
+}
+
+/* ----------------- Additional Styling ----------------- */
+
+/* Styling for the "Thought and searched for..." line */
+.thought {
+  font-style: italic;
+  color: var(--accent-color);
+  margin-bottom: 1.3rem;
+}
+
+.sources {
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+/* Styling for the answer text */
+.answer {
+  margin: 0;
+  line-height: 1.85;
+}
+
+/* Post-answer icons container: placed below the bot bubble */
+.post-icons {
+  display: flex;
+  padding-left: 0.12rem;
+  gap: 1rem;
+}
+
+/* Make each post icon container position relative for tooltip positioning */
+.post-icons .copy-icon,
+.post-icons .evaluate-icon,
+.post-icons .sources-icon {
+  cursor: pointer;
+  position: relative;
+}
+
+/* Apply a brightness filter to the icon images on hover */
+.post-icons .copy-icon img,
+.post-icons .evaluate-icon img,
+.post-icons .sources-icon img {
+  transition: filter var(--transition-speed);
+}
+
+.post-icons .copy-icon:hover img,
+.post-icons .evaluate-icon:hover img,
+.post-icons .sources-icon:hover img {
+  filter: brightness(0.65);
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) scale(0.9);
+  transform-origin: bottom center;
+  margin-bottom: 0.65rem;
+  padding: 0.3rem 0.6rem;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Show the tooltip on hover */
+.post-icons .copy-icon:hover .tooltip,
+.post-icons .evaluate-icon:hover .tooltip,
+.post-icons .sources-icon:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Styling for the question text */
+.question {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Reduce the size of user and bot icons */
+.user-icon img,
+.bot-icon img {
+  width: 35px;
+  height: 35px;
+  object-fit: contain;
+}
+
+/* Reduce the size of the post-action icons */
+.post-icons img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
