@@ -1,0 +1,140 @@
+/* Right Sidebar Specific */
+.right-side-bar {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    transition: transform var(--transition-speed);
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+  }
+  
+  .right-side-bar.closed {
+    transform: translateX(100%);
+  }
+  
+  /* Resizer for the right sidebar */
+  .resizer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    cursor: ew-resize;
+    background: transparent;
+  }
+  
+  /* Toggle Buttons - base style */
+  .toggle-btn {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+    z-index: 1100;
+  }
+  
+  /* Right Toggle Button Custom Styles */
+  .toggle-btn.right-toggle {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    padding: 0;
+  }
+  
+  .toggle-btn.right-toggle:hover {
+    background: var(--accent-color);
+    color: var(--dark-surface);
+  }
+  
+  /* Sidebar Headers */
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  
+  /* Close Button */
+  .close-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color var(--transition-speed);
+  }
+  
+  .close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  /* Navigation Links */
+  .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+  }
+  
+  .nav-links li {
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background var(--transition-speed), color var(--transition-speed);
+  }
+  
+  .nav-links li:hover {
+    background-color: var(--hover-bg);
+    color: var(--secondary-color);
+  }
+  
+  /* Responsive Adjustments for Right Sidebar */
+  @media (max-width: 768px) {
+    .right-side-bar {
+      width: 200px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .right-side-bar {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      right: 0;
+      transform: translateY(-100%);
+    }
+    .right-side-bar.open {
+      transform: translateY(0);
+    }
+    .toggle-btn.right-toggle {
+      top: auto;
+      bottom: 1rem;
+      right: 1rem;
+    }
+  }  
