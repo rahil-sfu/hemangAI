@@ -1,0 +1,59 @@
+/* Left Sidebar Specific */
+.left-side-bar {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    transition: transform var(--transition-speed);
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+  }
+  
+  .left-side-bar.closed {
+    transform: translateX(-100%);
+  }
+  
+  /* Toggle Button for Left Sidebar */
+  .toggle-btn.left-toggle {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+    z-index: 1100;
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Responsive Adjustments for Left Sidebar */
+  @media (max-width: 768px) {
+    .left-side-bar {
+      width: 200px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .left-side-bar {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      transform: translateY(-100%);
+    }
+    .left-side-bar.open {
+      transform: translateY(0);
+    }
+    .toggle-btn.left-toggle {
+      top: auto;
+      bottom: 1rem;
+      left: 1rem;
+    }
+  }  
