@@ -1,244 +1,228 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './AiPage.css';
-
-import settingsLogo from '../Icons/settings-2.svg';
-import botLogo from '../Icons/bot.png';
-import copyLogo from '../Icons/copy.png';
-import evaluteLogo from '../Icons/evaluate.png';
-import graphLogo from '../Icons/graph.png';
-import reprocess from '../Icons/reprocess.png';
-import sources from '../Icons/sources.png';
-import user from '../Icons/user.png';
-
-import { FaTimes, FaChevronLeft, FaCog, FaPaperPlane } from 'react-icons/fa';
-import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import { FaCog, FaPaperPlane } from 'react-icons/fa';
 import IntialSetting from './IntialSetting';
 import ChatWindow from './AiComponents/ChatWindow';
-import LeftSideBar from './AiComponents/LeftSideBar';
+import RightSidebar from './AiComponents/RightSidebar';
+// Uncomment the following line to enable the left sidebar in the future:
+// import LeftSidebar from './LeftSidebar';
 
 function AiPage() {
-  const [isLeftSidebarOpen, setLeftSidebarOpen] = useState(
-    localStorage.getItem("leftSidebarState") === "true"
-  );
+  // (Right sidebar state and functions have been lifted here)
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(
     localStorage.getItem("rightSidebarState") === "true"
   );
   const [rightSidebarWidth, setRightSidebarWidth] = useState(300);
-  const minWidth = 200;
-  const maxWidth = 450;
+
   const [searchText, setSearchText] = useState("");
   const textAreaRef = useRef(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // State to track if the ChatWindow is shown
+  // State to track if the ChatWindow (chat mode) is shown
   const [showChatWindow, setShowChatWindow] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem("leftSidebarState", isLeftSidebarOpen);
-  }, [isLeftSidebarOpen]);
+  // New state: Array of chat blocks (each block represents a ChatWindow)
+  const [chatBlocks, setChatBlocks] = useState([]);
+
+  // States for dynamic resizing and dynamic bottom padding in chat mode
+  const [defaultChatHeight, setDefaultChatHeight] = useState(null);
+  const [chatBottomPadding, setChatBottomPadding] = useState("60px");
 
   useEffect(() => {
     localStorage.setItem("rightSidebarState", isRightSidebarOpen);
   }, [isRightSidebarOpen]);
 
-  // Dynamically resize the text area
+  // Update CSS variable for the right sidebar width so that the CSS can use it
+  useEffect(() => {
+    document.documentElement.style.setProperty('--right-sidebar-width', rightSidebarWidth + 'px');
+  }, [rightSidebarWidth]);
+
+  // Dynamically resize the textarea (applies to both modes, but especially used for chat mode)
   useEffect(() => {
     if (textAreaRef.current) {
-      // Reset height to auto so we can recalc proper scrollHeight
+      // On first run, store the default (one-line) height if not already set
+      if (!defaultChatHeight) {
+        setDefaultChatHeight(textAreaRef.current.scrollHeight);
+      }
+      
+      // Reset the height so we can remeasure
       textAreaRef.current.style.height = "auto";
-      // Force no scrolling until we decide we need it
       textAreaRef.current.style.overflowY = "hidden";
 
-      // Now calculate the new height
       const newHeight = textAreaRef.current.scrollHeight;
+      let finalHeight = newHeight;
 
-      // If it exceeds 200px, clamp to 200px and show scrollbar
+      // Clamp height at 200px and enable scrolling on the textarea if needed
       if (newHeight > 200) {
-        textAreaRef.current.style.height = "200px";
+        finalHeight = 200;
         textAreaRef.current.style.overflowY = "auto";
-      } else {
-        textAreaRef.current.style.height = `${newHeight}px`;
       }
+      textAreaRef.current.style.height = `${finalHeight}px`;
+
+      // Calculate dynamic bottom padding:
+      //   - Minimum padding = 0px when at one line (i.e. defaultChatHeight)
+      //   - Maximum padding = 59px when the textarea reaches 200px
+      const minPaddingPx = 0;
+      const maxPaddingPx = 59;
+      let newPaddingPx = minPaddingPx;
+
+      if (defaultChatHeight && finalHeight > defaultChatHeight) {
+        newPaddingPx =
+          minPaddingPx +
+          ((finalHeight - defaultChatHeight) / (200 - defaultChatHeight)) *
+            (maxPaddingPx - minPaddingPx);
+        if (newPaddingPx > maxPaddingPx) {
+          newPaddingPx = maxPaddingPx;
+        }
+      }
+      setChatBottomPadding(`${newPaddingPx}px`);
     }
-  }, [searchText]);
-
-  const toggleLeftSidebar = () => {
-    setLeftSidebarOpen(!isLeftSidebarOpen);
-  };
-
-  const toggleRightSidebar = () => {
-    setRightSidebarOpen(!isRightSidebarOpen);
-  };
-
-  const startResize = (e) => {
-    e.preventDefault();
-    document.addEventListener("mousemove", resizeSidebar);
-    document.addEventListener("mouseup", stopResize);
-  };
-
-  const resizeSidebar = (e) => {
-    let newWidth = window.innerWidth - e.clientX;
-    if (newWidth < minWidth) newWidth = minWidth;
-    if (newWidth > maxWidth) newWidth = maxWidth;
-    setRightSidebarWidth(newWidth);
-  };
-
-  const stopResize = () => {
-    document.removeEventListener("mousemove", resizeSidebar);
-    document.removeEventListener("mouseup", stopResize);
-  };
+  }, [searchText, defaultChatHeight]);
 
   /* 
-  Handle sending the message. This function will be called on:
-    1) Click on send icon.
-    2) Pressing Enter (without Shift) in the text area. 
+    Handle sending the message on:
+      - Click on send icon.
+      - Pressing Enter (without Shift) in the textarea.
   */
   const handleSend = async () => {
+    // If the input is empty, do nothing and do not proceed to chat mode
     if (!searchText.trim()) return;
+
+    // If chat mode is not enabled, enable it and add the first chat block
+    if (!showChatWindow) {
+      setShowChatWindow(true);
+      setChatBlocks([{ id: new Date().getTime() }]);
+    } else {
+      // If chat mode is already enabled, add a new chat block
+      setChatBlocks(prevBlocks => [...prevBlocks, { id: new Date().getTime() }]);
+    }
+    
+    // Clear the input immediately after sending the message
+    setSearchText("");
+
     try {
-      // Construct the GET request with query param
-      const endpoint = `http://127.0.0.1:8000/message-sse?user_message=${encodeURIComponent(searchText)}`;
-      
-      // Send GET request
-      const response = await fetch(endpoint, {
-        method: 'GET',
-      });
+      const endpoint = `http://127.0.0.1:8000/message-sse?user_message=${encodeURIComponent(
+        searchText
+      )}`;
+      const response = await fetch(endpoint, { method: "GET" });
       if (!response.ok) {
         console.error("Network response was not ok:", response.statusText);
       }
-      // Handle the response here
-      // const data = await response.text();
-      // console.log("Response from server:", data);
-
-      // Clear the input after sending
-      setSearchText("");
-
+      // Optionally process the response here
     } catch (error) {
       console.error("Error while sending message:", error);
     }
   };
 
   /* 
-  Handle key presses within the text area:- 
-  1. Enter without Shift => Send message 
-  2. Shift+Enter => New line 
+    Handle key presses within the textarea:
+      - Enter without Shift: Send message and add new chat block.
+      - Shift+Enter: New line
   */
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      // Check if SHIFT is pressed
+    if (e.key === "Enter") {
       if (!e.shiftKey) {
-        // Prevent default newline
         e.preventDefault();
         handleSend();
       }
-      // if SHIFT is pressed, allow the default => new line
     }
   };
 
   // When the send button is pressed:
   const handleSendButtonClick = () => {
-    // Optionally process searchText here if needed
-    setShowChatWindow(true);
+    // Only proceed if the input is not empty
+    if (searchText.trim()) {
+      handleSend();
+    }
   };
 
   return (
-    <div className='app-container'>
-        <nav className={`left-side-bar ${isLeftSidebarOpen ? 'open' : 'closed'}`}>
-          <div className='sidebar-header'>
-            <h3>Sources</h3>
-            <button className='close-btn' onClick={toggleLeftSidebar}>
-              <FaTimes />
-            </button>
-          </div>
-          <LeftSideBar />
-
-        </nav>
-        {/* {!isLeftSidebarOpen && (
-            <button className='toggle-btn left-toggle' onClick={toggleLeftSidebar}>
-                <BsChevronRight />
-            </button>
-        )}  */}
-     
-      
-      <nav
-        className={`right-side-bar ${isRightSidebarOpen ? 'open' : 'closed'}`}
-        style={{ width: isRightSidebarOpen ? rightSidebarWidth : undefined }}
-      >
-        <div className='sidebar-header'>
-          <h3>Quick Actions</h3>
-          <button className='close-btn' onClick={toggleRightSidebar}>
-            <FaTimes />
-          </button>
+    <div 
+      className="app-container"
+      style={{
+        paddingRight: isRightSidebarOpen
+          ? Math.max(0, rightSidebarWidth - 250) + 'px'
+          : 0,
+      }}
+    >
+      {showChatWindow && (
+        <div className="floating-sidebar">
+          <RightSidebar 
+            isOpen={isRightSidebarOpen}
+            rightSidebarWidth={rightSidebarWidth}
+            setRightSidebarWidth={setRightSidebarWidth}
+            toggleRightSidebar={() => setRightSidebarOpen(!isRightSidebarOpen)}
+          />
         </div>
-        <ul className='nav-links'>
-          <li>What is the weather</li>
-          <li>Top 5 Places to live</li>
-          <li>Trump Election</li>
-        </ul>
-        <div className="resizer" onMouseDown={startResize}></div>
-      </nav>
-
-      {!isRightSidebarOpen && (
-        <button className='toggle-btn right-toggle' onClick={toggleRightSidebar}>
-          <BsChevronLeft />
-        </button>
       )}
-
-      <main className='main-content'>
+      
+      <main className="main-content">
         {showChatWindow ? (
-          // Chat mode: ChatWindow on top and the search bar fixed at the bottom
           <>
-            <div className="chat-container" style={{ flexGrow: 1 }}>
-              <ChatWindow 
-                openRightSidebar={() => setRightSidebarOpen(true)} 
-                openLeftSidebar={() => setLeftSidebarOpen(true)} 
-              />
+            <div className="chat-container">
+              {chatBlocks.map((block) => (
+                <ChatWindow
+                  key={block.id}
+                  openLeftSidebar={() => {}} // Placeholder function
+                  openRightSidebar={() => { setRightSidebarOpen(true); }}
+                />
+              ))}
             </div>
-            <div className="search-bar search-bar-fixed">
-              <div className="search-input-wrapper">
+            <div 
+              className="floating-chat-search-bar"
+              style={{
+                transform: isRightSidebarOpen
+                  ? `translateX(calc(-50% - ${Math.max(0, (rightSidebarWidth - 250) / 2)}px))`
+                  : 'translateX(-50%)'               
+              }}
+            >
+              <div className="chat-search-input-wrapper" style={{ paddingBottom: chatBottomPadding }}>
                 <textarea
-                  className='search-input'
-                  placeholder='Ask follow-up'
+                  rows="1"
+                  className="chat-search-input"
+                  placeholder="Message..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   ref={textAreaRef}
-                />  
+                />
               </div>
-              <div className="icon-container">
-                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+              <div className="chat-icon-container">
+                <button
+                  className="chat-settings-btn"
+                  onClick={() => setShowSettingsModal(true)}
+                >
                   <FaCog />
                 </button>
-                <button 
-                  className='send-btn'
-                  onClick={handleSendButtonClick}
-                >
+                <button className="chat-send-btn" onClick={handleSendButtonClick}>
                   <FaPaperPlane />
                 </button>
               </div>
             </div>
           </>
         ) : (
-          // Initial mode: Show header and centered search bar
-          <div className='search-area'>
+          <div className="search-area">
             <h1>How can I help you today?</h1>
-            <div className='search-bar'>
+            <div className="search-bar">
               <div className="search-input-wrapper">
                 <textarea
-                  className='search-input'
-                  placeholder='Ask anything...'
+                  rows="1"
+                  className="search-input"
+                  placeholder="Message..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   ref={textAreaRef}
                 />
               </div>
               <div className="icon-container">
-                <button className='settings-btn' onClick={() => setShowSettingsModal(true)}>
+                <button
+                  className="settings-btn"
+                  onClick={() => setShowSettingsModal(true)}
+                >
                   <FaCog />
                 </button>
-                <button 
-                  className='send-btn'
-                  onClick={handleSendButtonClick}
-                >
+                <button className="send-btn" onClick={handleSendButtonClick}>
                   <FaPaperPlane />
                 </button>
               </div>
@@ -246,9 +230,12 @@ function AiPage() {
           </div>
         )}
       </main>
-      
+
       {showSettingsModal && (
-        <IntialSetting trigger={true} setTrigger={() => setShowSettingsModal(false)} />
+        <IntialSetting
+          trigger={true}
+          setTrigger={() => setShowSettingsModal(false)}
+        />
       )}
     </div>
   );
