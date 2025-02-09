@@ -1,9 +1,9 @@
-// RightSidebar.js
 import React from 'react';
 import { FaTimes, FaCheck } from 'react-icons/fa';
 import { BsChevronLeft } from 'react-icons/bs';
 import CircularProgress from '@mui/material/CircularProgress';
 import './RightSidebar.css';
+// Import the separate Sources component
 import Sources from './Sources';
 
 function RightSidebar({
@@ -12,9 +12,12 @@ function RightSidebar({
   setRightSidebarWidth,
   toggleRightSidebar,
   sidebarContent,
-  tasks,
+  tasks = [],
   tasksLoading,
-  onTaskClick,  // new prop for handling task clicks
+  sources = [],
+  sourcesLoading,
+  onTaskClick,
+  onSourceClick, // optional: if not provided, a default will be used
 }) {
   const minWidth = 200;
   const maxWidth = 450;
@@ -38,6 +41,13 @@ function RightSidebar({
     document.removeEventListener("mouseup", stopResize);
   };
 
+  // Default handler for source clicks: open the link in a new tab.
+  const handleSourceClick = (source) => {
+    if (source && source.link) {
+      window.open(source.link, '_blank');
+    }
+  };
+
   return (
     <>
       <nav
@@ -52,7 +62,14 @@ function RightSidebar({
         </div>
         <div className="sidebar-content">
           {sidebarContent === "sources" ? (
-            <Sources />
+            sourcesLoading ? (
+              <div className="tasks-loading">
+                <CircularProgress size={20} sx={{ color: '#ccc' }} />
+                <span className="loading-tasks-text">Generating sources...</span>
+              </div>
+            ) : (
+              <Sources sources={sources} handleSourceClick={onSourceClick || handleSourceClick} />
+            )
           ) : (
             tasksLoading ? (
               <div className="tasks-loading">

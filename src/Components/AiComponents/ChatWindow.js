@@ -54,6 +54,9 @@ function ChatWindow({ userMessage, aiAnswer, thinkingTime, openRightSidebar, ope
                   <span className="thinking-time">Thought for {thinkingTime} seconds</span>
                 </div>
               )}
+              <div>
+                <p className='sources-read'>Sources Read: 3 </p>
+              </div>
               <div className="message-bubble bot-bubble">
                 <p className="answer" ref={answerRef}>
                   {aiAnswer}

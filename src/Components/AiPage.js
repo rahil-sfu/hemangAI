@@ -24,9 +24,11 @@ function AiPage() {
   // Each chat block now has userMessage and aiAnswer properties.
   const [chatBlocks, setChatBlocks] = useState([]);
 
-  // New states for tasks
+  // New states for tasks and sources
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(false);
+  const [sources, setSources] = useState([]);
+  const [sourcesLoading, setSourcesLoading] = useState(false);
 
   // States for dynamic resizing and dynamic bottom padding in chat mode
   const [defaultChatHeight, setDefaultChatHeight] = useState(null);
@@ -72,7 +74,7 @@ function AiPage() {
     }
   }, [searchText, defaultChatHeight]);
 
-  // Function to get the AI response (Gemini API call)
+  // Function to get the AI response using Gemini API
   const getAIResponse = async (prompt) => {
     try {
       const { GoogleGenerativeAI } = await import('@google/generative-ai');
@@ -86,14 +88,12 @@ function AiPage() {
     }
   };
 
-  // New function to generate tasks based on the prompt
+  // New function to generate tasks
   const generateTasks = async (prompt) => {
     setTasksLoading(true);
     try {
-      // Modify the prompt as needed to instruct Gemini to output 9 numbered tasks.
-      const tasksPrompt = `Based on the prompt: "${prompt}", generate 9 interesting questions for further exploration. Return them as a numbered list with each item on a new line.`;
+      const tasksPrompt = `Based on the prompt: "${prompt}", generate 9 interesting questions for further exploration. Return them as a numbered list, one per line.`;
       const tasksResponse = await getAIResponse(tasksPrompt);
-      // Assume tasksResponse is a numbered list separated by newlines.
       const tasksArray = tasksResponse
         .split('\n')
         .map(line => line.trim())
@@ -107,7 +107,98 @@ function AiPage() {
     }
   };
 
-  // Function to open the right sidebar with desired content.
+  const generateSources = async (prompt) => {
+    setSourcesLoading(true);
+    try {
+      const sourcesPrompt = `Based on the prompt: "${prompt}", generate 3 reliable sources in JSON format. The JSON should be an array of objects with keys "title", "description", and "link".`;
+      // const sourcesResponse = await getAIResponse(sourcesPrompt);
+
+      const sourcesResponse = `[
+        {
+          "title": "National Geographic – Nature",
+          "description": "National Geographic offers a wealth of articles and essays that explore the beauty...",
+          "link": "https://www.nationalgeographic.com/environment"
+        },
+        {
+          "title": "The Nature Conservancy – Conservation Insights",
+          "description": "The Nature Conservancy delivers reliable research and commentary on nature conservation...",
+          "link": "https://www.nature.org/en-us/what-we-do/our-insights/"
+        },
+        {
+          "title": "World Wildlife Fund (WWF) – Ecosystem and Wildlife",
+          "description": "WWF provides comprehensive resources on ecosystem health and wildlife conservation, featuring...",
+          "link": "https://www.worldwildlife.org/places"
+        },
+        {
+          "title": "National Geographic – Nature",
+          "description": "National Geographic offers a wealth of articles and essays that explore the beauty...",
+          "link": "https://www.nationalgeographic.com/environment"
+        },
+        {
+          "title": "The Nature Conservancy – Conservation Insights",
+          "description": "The Nature Conservancy delivers reliable research and commentary on nature conservation...",
+          "link": "https://www.nature.org/en-us/what-we-do/our-insights/"
+        },
+        {
+          "title": "World Wildlife Fund (WWF) – Ecosystem and Wildlife",
+          "description": "WWF provides comprehensive resources on ecosystem health and wildlife conservation, featuring...",
+          "link": "https://www.worldwildlife.org/places"
+        },
+        {
+          "title": "National Geographic – Nature",
+          "description": "National Geographic offers a wealth of articles and essays that explore the beauty...",
+          "link": "https://www.nationalgeographic.com/environment"
+        },
+        {
+          "title": "The Nature Conservancy – Conservation Insights",
+          "description": "The Nature Conservancy delivers reliable research and commentary on nature conservation...",
+          "link": "https://www.nature.org/en-us/what-we-do/our-insights/"
+        },
+        {
+          "title": "World Wildlife Fund (WWF) – Ecosystem and Wildlife",
+          "description": "WWF provides comprehensive resources on ecosystem health and wildlife conservation, featuring...",
+          "link": "https://www.worldwildlife.org/places"
+        }
+      ]`;
+  
+      let parsedSources = [];
+      try {
+        parsedSources = JSON.parse(sourcesResponse);
+        // Ensure we have an array. If not, throw an error to trigger fallback.
+        if (!Array.isArray(parsedSources)) {
+          throw new Error("Parsed JSON is not an array");
+        }
+        // Optionally, validate or normalize each object in the array:
+        parsedSources = parsedSources.map((source) => ({
+          title: source.title || "Untitled",
+          description: source.description || "",
+          link: source.link || "#",
+        }));
+      } catch (e) {
+        console.error("Error parsing JSON, falling back to line parsing:", e);
+        // Fallback: assume each non-empty line is in "Title - Description - Link" format.
+        parsedSources = sourcesResponse.split("\n")
+          .filter((line) => line.trim() !== "")
+          .map((line) => {
+            const parts = line.split(" - ");
+            return {
+              title: parts[0] ? parts[0].trim() : "Untitled",
+              description: parts[1] ? parts[1].trim() : "",
+              link: parts[2] ? parts[2].trim() : "#",
+            };
+          });
+      }
+      setSources(parsedSources);
+    } catch (error) {
+      console.error("Error generating sources:", error);
+      setSources([]);
+    } finally {
+      setSourcesLoading(false);
+    }
+  };
+  
+
+  // New function that opens the right sidebar with the desired content.
   const handleOpenRightSidebar = (content) => {
     if (content) {
       setSidebarContent(content);
@@ -117,11 +208,11 @@ function AiPage() {
     setRightSidebarOpen(true);
   };
 
+  // New function for handling a task click (sends the task as prompt to generate an answer)
   const handleTaskClick = async (task) => {
     if (!task.trim()) return;
     const blockId = new Date().getTime();
     const startTime = Date.now();
-    // Create a new chat block using the task text as the prompt.
     setChatBlocks(prev => [
       ...prev,
       { id: blockId, userMessage: task, aiAnswer: "Loading...", thinkingTime: null }
@@ -135,7 +226,12 @@ function AiPage() {
       )
     );
   };
-  
+
+  // (Optional: You can also add a similar handler for sources if you want clicking a source to send its title as a prompt.)
+  const handleSourceClick = (source) => {
+    if (!source || !source.link) return;
+    window.open(source.link, '_blank');
+  };
 
   const handleSend = async () => {
     if (!searchText.trim()) return;
@@ -156,13 +252,14 @@ function AiPage() {
     const prompt = searchText;
     setSearchText("");
   
-    // Start generating tasks concurrently
+    // Start generating tasks and sources concurrently
     generateTasks(prompt);
+    generateSources(prompt);
   
     // Get the AI answer for the chat
     const aiAnswer = await getAIResponse(prompt);
     const endTime = Date.now();
-    const thinkingTime = ((endTime - startTime) / 1000).toFixed(1); // seconds with one decimal
+    const thinkingTime = ((endTime - startTime) / 1000).toFixed(1);
   
     // Update the chat block with the AI answer and thinking time
     setChatBlocks(prev =>
@@ -192,21 +289,23 @@ function AiPage() {
           : 0,
       }}
     >
-    {showChatWindow && (
-      <div className="floating-sidebar">
-        <RightSidebar 
-          isOpen={isRightSidebarOpen}
-          rightSidebarWidth={rightSidebarWidth}
-          setRightSidebarWidth={setRightSidebarWidth}
-          toggleRightSidebar={() => setRightSidebarOpen(!isRightSidebarOpen)}
-          sidebarContent={sidebarContent}  // pass sidebar content state
-          tasks={tasks}
-          tasksLoading={tasksLoading}
-          onTaskClick={handleTaskClick}  // pass our new task click handler
-        />
-      </div>
-    )}
-
+      {showChatWindow && (
+        <div className="floating-sidebar">
+          <RightSidebar 
+            isOpen={isRightSidebarOpen}
+            rightSidebarWidth={rightSidebarWidth}
+            setRightSidebarWidth={setRightSidebarWidth}
+            toggleRightSidebar={() => setRightSidebarOpen(!isRightSidebarOpen)}
+            sidebarContent={sidebarContent}  // pass sidebar content state
+            tasks={tasks}
+            tasksLoading={tasksLoading}
+            sources={sources}               // new prop for sources
+            sourcesLoading={sourcesLoading} // new prop for sources loading state
+            onTaskClick={handleTaskClick}   // handler for task clicks
+            onSourceClick={handleSourceClick} // handler for source clicks (if needed)
+          />
+        </div>
+      )}
       
       <main className="main-content">
         {showChatWindow ? (
