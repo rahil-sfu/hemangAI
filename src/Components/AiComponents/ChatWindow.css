@@ -203,6 +203,7 @@
 .thinking-time {
   font-size: 0.9rem;
   color: #888;
+  cursor: pointer;
 }
 
 /* Additional styles for the chat window remain unchanged */

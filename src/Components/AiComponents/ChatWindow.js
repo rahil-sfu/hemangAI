@@ -51,7 +51,7 @@ function ChatWindow({ userMessage, aiAnswer, thinkingTime, openRightSidebar, ope
             <div className="bot-container">
               {thinkingTime && (
                 <div className="thinking-info">
-                  <span className="thinking-time">Thought for {thinkingTime} seconds</span>
+                  <span className="thinking-time" onClick={() => openRightSidebar()}>Thought for {thinkingTime} seconds</span>
                 </div>
               )}
               <div>
