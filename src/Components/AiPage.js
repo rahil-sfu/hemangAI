@@ -1,28 +1,32 @@
+// AiPage.js
 import React, { useState, useEffect, useRef } from 'react';
 import './AiPage.css';
 import { FaCog, FaPaperPlane } from 'react-icons/fa';
 import IntialSetting from './IntialSetting';
 import ChatWindow from './AiComponents/ChatWindow';
 import RightSidebar from './AiComponents/RightSidebar';
-// Uncomment the following line to enable the left sidebar in the future:
 // import LeftSidebar from './LeftSidebar';
 
 function AiPage() {
-  // (Right sidebar state and functions have been lifted here)
+  // Right sidebar state
   const [isRightSidebarOpen, setRightSidebarOpen] = useState(
     localStorage.getItem("rightSidebarState") === "true"
   );
   const [rightSidebarWidth, setRightSidebarWidth] = useState(300);
+  const [sidebarContent, setSidebarContent] = useState("default"); // new state
 
   const [searchText, setSearchText] = useState("");
   const textAreaRef = useRef(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // State to track if the ChatWindow (chat mode) is shown
+  // Chat mode states
   const [showChatWindow, setShowChatWindow] = useState(false);
-
-  // New state: Array of chat blocks (each block represents a ChatWindow)
+  // Each chat block now has userMessage and aiAnswer properties.
   const [chatBlocks, setChatBlocks] = useState([]);
+
+  // New states for tasks
+  const [tasks, setTasks] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
 
   // States for dynamic resizing and dynamic bottom padding in chat mode
   const [defaultChatHeight, setDefaultChatHeight] = useState(null);
@@ -37,103 +41,146 @@ function AiPage() {
     document.documentElement.style.setProperty('--right-sidebar-width', rightSidebarWidth + 'px');
   }, [rightSidebarWidth]);
 
-  // Dynamically resize the textarea (applies to both modes, but especially used for chat mode)
+  // Dynamically resize the textarea
   useEffect(() => {
     if (textAreaRef.current) {
-      // On first run, store the default (one-line) height if not already set
       if (!defaultChatHeight) {
         setDefaultChatHeight(textAreaRef.current.scrollHeight);
       }
-      
-      // Reset the height so we can remeasure
       textAreaRef.current.style.height = "auto";
       textAreaRef.current.style.overflowY = "hidden";
 
       const newHeight = textAreaRef.current.scrollHeight;
       let finalHeight = newHeight;
-
-      // Clamp height at 200px and enable scrolling on the textarea if needed
       if (newHeight > 200) {
         finalHeight = 200;
         textAreaRef.current.style.overflowY = "auto";
       }
       textAreaRef.current.style.height = `${finalHeight}px`;
 
-      // Calculate dynamic bottom padding:
-      //   - Minimum padding = 0px when at one line (i.e. defaultChatHeight)
-      //   - Maximum padding = 59px when the textarea reaches 200px
       const minPaddingPx = 0;
       const maxPaddingPx = 59;
       let newPaddingPx = minPaddingPx;
-
       if (defaultChatHeight && finalHeight > defaultChatHeight) {
         newPaddingPx =
           minPaddingPx +
           ((finalHeight - defaultChatHeight) / (200 - defaultChatHeight)) *
             (maxPaddingPx - minPaddingPx);
-        if (newPaddingPx > maxPaddingPx) {
-          newPaddingPx = maxPaddingPx;
-        }
+        if (newPaddingPx > maxPaddingPx) newPaddingPx = maxPaddingPx;
       }
       setChatBottomPadding(`${newPaddingPx}px`);
     }
   }, [searchText, defaultChatHeight]);
 
-  /* 
-    Handle sending the message on:
-      - Click on send icon.
-      - Pressing Enter (without Shift) in the textarea.
-  */
-  const handleSend = async () => {
-    // If the input is empty, do nothing and do not proceed to chat mode
-    if (!searchText.trim()) return;
+  // Function to get the AI response (Gemini API call)
+  const getAIResponse = async (prompt) => {
+    try {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI("AIzaSyCx3MefHEMw2MNfzB2fI2IvpBnWBGLirmg");
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(prompt);
+      return result.response.text();
+    } catch (error) {
+      console.error("Error calling the Generative AI API:", error);
+      return "Error generating response.";
+    }
+  };
 
-    // If chat mode is not enabled, enable it and add the first chat block
+  // New function to generate tasks based on the prompt
+  const generateTasks = async (prompt) => {
+    setTasksLoading(true);
+    try {
+      // Modify the prompt as needed to instruct Gemini to output 9 numbered tasks.
+      const tasksPrompt = `Based on the prompt: "${prompt}", generate 9 interesting questions for further exploration. Return them as a numbered list with each item on a new line.`;
+      const tasksResponse = await getAIResponse(tasksPrompt);
+      // Assume tasksResponse is a numbered list separated by newlines.
+      const tasksArray = tasksResponse
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+      setTasks(tasksArray);
+    } catch (error) {
+      console.error("Error generating tasks:", error);
+      setTasks([]);
+    } finally {
+      setTasksLoading(false);
+    }
+  };
+
+  // Function to open the right sidebar with desired content.
+  const handleOpenRightSidebar = (content) => {
+    if (content) {
+      setSidebarContent(content);
+    } else {
+      setSidebarContent("default");
+    }
+    setRightSidebarOpen(true);
+  };
+
+  const handleTaskClick = async (task) => {
+    if (!task.trim()) return;
+    const blockId = new Date().getTime();
+    const startTime = Date.now();
+    // Create a new chat block using the task text as the prompt.
+    setChatBlocks(prev => [
+      ...prev,
+      { id: blockId, userMessage: task, aiAnswer: "Loading...", thinkingTime: null }
+    ]);
+    const aiAnswer = await getAIResponse(task);
+    const endTime = Date.now();
+    const thinkingTime = ((endTime - startTime) / 1000).toFixed(1);
+    setChatBlocks(prev =>
+      prev.map(block =>
+        block.id === blockId ? { ...block, aiAnswer, thinkingTime } : block
+      )
+    );
+  };
+  
+
+  const handleSend = async () => {
+    if (!searchText.trim()) return;
+    const blockId = new Date().getTime();
+    const startTime = Date.now(); // record start time
+  
+    // Add a new chat block with a loading placeholder and no thinkingTime yet
     if (!showChatWindow) {
       setShowChatWindow(true);
-      setChatBlocks([{ id: new Date().getTime() }]);
+      setChatBlocks([{ id: blockId, userMessage: searchText, aiAnswer: "Loading...", thinkingTime: null }]);
     } else {
-      // If chat mode is already enabled, add a new chat block
-      setChatBlocks(prevBlocks => [...prevBlocks, { id: new Date().getTime() }]);
+      setChatBlocks(prev => [
+        ...prev,
+        { id: blockId, userMessage: searchText, aiAnswer: "Loading...", thinkingTime: null },
+      ]);
     }
     
-    // Clear the input immediately after sending the message
+    const prompt = searchText;
     setSearchText("");
-
-    try {
-      const endpoint = `http://127.0.0.1:8000/message-sse?user_message=${encodeURIComponent(
-        searchText
-      )}`;
-      const response = await fetch(endpoint, { method: "GET" });
-      if (!response.ok) {
-        console.error("Network response was not ok:", response.statusText);
-      }
-      // Optionally process the response here
-    } catch (error) {
-      console.error("Error while sending message:", error);
-    }
+  
+    // Start generating tasks concurrently
+    generateTasks(prompt);
+  
+    // Get the AI answer for the chat
+    const aiAnswer = await getAIResponse(prompt);
+    const endTime = Date.now();
+    const thinkingTime = ((endTime - startTime) / 1000).toFixed(1); // seconds with one decimal
+  
+    // Update the chat block with the AI answer and thinking time
+    setChatBlocks(prev =>
+      prev.map(block =>
+        block.id === blockId ? { ...block, aiAnswer, thinkingTime } : block
+      )
+    );
   };
 
-  /* 
-    Handle key presses within the textarea:
-      - Enter without Shift: Send message and add new chat block.
-      - Shift+Enter: New line
-  */
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      if (!e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    }
-  };
-
-  // When the send button is pressed:
-  const handleSendButtonClick = () => {
-    // Only proceed if the input is not empty
-    if (searchText.trim()) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleSendButtonClick = () => {
+    if (searchText.trim()) handleSend();
   };
 
   return (
@@ -145,16 +192,21 @@ function AiPage() {
           : 0,
       }}
     >
-      {showChatWindow && (
-        <div className="floating-sidebar">
-          <RightSidebar 
-            isOpen={isRightSidebarOpen}
-            rightSidebarWidth={rightSidebarWidth}
-            setRightSidebarWidth={setRightSidebarWidth}
-            toggleRightSidebar={() => setRightSidebarOpen(!isRightSidebarOpen)}
-          />
-        </div>
-      )}
+    {showChatWindow && (
+      <div className="floating-sidebar">
+        <RightSidebar 
+          isOpen={isRightSidebarOpen}
+          rightSidebarWidth={rightSidebarWidth}
+          setRightSidebarWidth={setRightSidebarWidth}
+          toggleRightSidebar={() => setRightSidebarOpen(!isRightSidebarOpen)}
+          sidebarContent={sidebarContent}  // pass sidebar content state
+          tasks={tasks}
+          tasksLoading={tasksLoading}
+          onTaskClick={handleTaskClick}  // pass our new task click handler
+        />
+      </div>
+    )}
+
       
       <main className="main-content">
         {showChatWindow ? (
@@ -163,8 +215,11 @@ function AiPage() {
               {chatBlocks.map((block) => (
                 <ChatWindow
                   key={block.id}
-                  openLeftSidebar={() => {}} // Placeholder function
-                  openRightSidebar={() => { setRightSidebarOpen(true); }}
+                  userMessage={block.userMessage}
+                  aiAnswer={block.aiAnswer}
+                  thinkingTime={block.thinkingTime}
+                  openRightSidebar={handleOpenRightSidebar}
+                  openLeftSidebar={() => { /* if needed */ }}
                 />
               ))}
             </div>

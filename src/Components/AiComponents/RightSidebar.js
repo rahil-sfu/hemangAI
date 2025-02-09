@@ -1,9 +1,21 @@
+// RightSidebar.js
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import { BsChevronLeft } from 'react-icons/bs';
+import CircularProgress from '@mui/material/CircularProgress';
 import './RightSidebar.css';
+import Sources from './Sources';
 
-function RightSidebar({ isOpen, rightSidebarWidth, setRightSidebarWidth, toggleRightSidebar }) {
+function RightSidebar({
+  isOpen,
+  rightSidebarWidth,
+  setRightSidebarWidth,
+  toggleRightSidebar,
+  sidebarContent,
+  tasks,
+  tasksLoading,
+  onTaskClick,  // new prop for handling task clicks
+}) {
   const minWidth = 200;
   const maxWidth = 450;
 
@@ -14,7 +26,6 @@ function RightSidebar({ isOpen, rightSidebarWidth, setRightSidebarWidth, toggleR
     document.addEventListener("mouseup", stopResize);
   };
 
-  // Calculates the new width based on the mouse position.
   const resizeSidebar = (e) => {
     let newWidth = window.innerWidth - e.clientX;
     if (newWidth < minWidth) newWidth = minWidth;
@@ -22,7 +33,6 @@ function RightSidebar({ isOpen, rightSidebarWidth, setRightSidebarWidth, toggleR
     setRightSidebarWidth(newWidth);
   };
 
-  // Removes the mousemove and mouseup event listeners.
   const stopResize = () => {
     document.removeEventListener("mousemove", resizeSidebar);
     document.removeEventListener("mouseup", stopResize);
@@ -35,16 +45,35 @@ function RightSidebar({ isOpen, rightSidebarWidth, setRightSidebarWidth, toggleR
         style={{ width: isOpen ? rightSidebarWidth : undefined }}
       >
         <div className="sidebar-header">
-          <h3>Quick Actions</h3>
+          <h3>{sidebarContent === "sources" ? "Sources" : "Tasks"}</h3>
           <button className="close-btn" onClick={toggleRightSidebar}>
             <FaTimes />
           </button>
         </div>
-        <ul className="nav-links">
-          <li>What is the weather</li>
-          <li>Top 5 Places to live</li>
-          <li>Trump Election</li>
-        </ul>
+        <div className="sidebar-content">
+          {sidebarContent === "sources" ? (
+            <Sources />
+          ) : (
+            tasksLoading ? (
+              <div className="tasks-loading">
+                <CircularProgress size={20} sx={{ color: '#ccc' }} />
+                <span className="loading-tasks-text">Generating tasks...</span>
+              </div>
+            ) : (
+              <ul className="nav-links">
+                {tasks.map((task, index) => (
+                  <li
+                    key={index}
+                    className="task-item"
+                    onClick={() => onTaskClick(task)}
+                  >
+                    {task} <span className="task-complete"><FaCheck /></span>
+                  </li>
+                ))}
+              </ul>
+            )
+          )}
+        </div>
         <div className="resizer" onMouseDown={startResize}></div>
       </nav>
       {!isOpen && (

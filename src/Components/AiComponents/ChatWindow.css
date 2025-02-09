@@ -14,6 +14,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 1rem;
+  min-width: 800px;
 }
 
 /* Common message row styling */
@@ -38,7 +39,7 @@
 }
 
 .user-message .user-icon {
-  margin-top: 0.1rem;
+
   margin-left: 0.5rem;
 }
 
@@ -49,9 +50,12 @@
 }
 
 .bot-message .bot-icon {
-  position: relative;
+  /* position: relative;
   margin-top: 5.85rem;
-  margin-right: 0.5rem;
+  margin-right: 0.5rem; */
+  margin-top: 2.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5em;
 }
 
 /* Container for the bot bubble and its post-icons */
@@ -167,3 +171,34 @@
   height: 20px;
   object-fit: contain;
 }
+
+/* ChatWindow.css */
+
+/* Container for the loading state with a dark background */
+.bot-loading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* adds space between the spinner and the text */
+  padding: 30px;
+  background-color: var(--dark-surface);  /* Dark background */
+}
+
+.loading-text {
+  margin: 0; /* removes any default margins */
+  font-size: 1rem;
+  color: #ccc;
+}
+
+/* Finished state: styling for the thought time info */
+.thinking-info {
+  margin-bottom: 4px;
+}
+
+.thinking-time {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* Additional styles for the chat window remain unchanged */

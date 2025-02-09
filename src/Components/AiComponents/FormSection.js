@@ -1,22 +1,9 @@
-import { useState } from 'react';
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const FormSection = ({ generateResponse }) => {
-    const [newQuestion, setNewQuestion] = useState('');
+const genAI = new GoogleGenerativeAI("AIzaSyCx3MefHEMw2MNfzB2fI2IvpBnWBGLirmg");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    return (
-        <div className="form-section">
-            <textarea
-                rows="5"
-                className="form-control"
-                placeholder="Ask me anything..."
-                value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
-            ></textarea>
-            <button className="btn" onClick={() => generateResponse(newQuestion, setNewQuestion)}>
-                Generate Response 🤖
-            </button>
-        </div>
-    )
-}
+const prompt = "Explain how AI works";
 
-export default FormSection;
+const result = await model.generateContent(prompt);
+console.log(result.response.text());
