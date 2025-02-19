@@ -29,11 +29,6 @@ Before you begin, ensure you have the following installed on your system:
 
 - **Git:** [Download Git](https://git-scm.com/)
 - **Node.js:** [Download Node.js](https://nodejs.org/) (v14 or higher recommended)
-- **npm or Yarn:** Package managers for JavaScript projects  
-  - To install Yarn, run:  
-    ```bash
-    npm install -g yarn
-    ```
 
 ## How to Start.
 
