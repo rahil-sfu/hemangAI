@@ -17,11 +17,11 @@ Welcome to **HemangAI** – your one-stop solution for all your questions and pr
 
 ## Screemshots
 Here are some screenshots of the project:
-![Home Page](public/screenshots/1.png)
-![Settings Page](publicscreenshots/2.png)
-![AI Page 1](publicscreenshots/3.png)
-![AI Page 2](publicscreenshots/4.png)
-![Answer Page](publicscreenshots/5.png)
+![Home Page](public/Screenshots/1.png)
+![Settings Page](public/Screenshots/2.png)
+![AI Page 1](public/Screenshots/3.png)
+![AI Page 2](public/Screenshots/4.png)
+![Answer Page](public/Screenshots/5.png)
 
 ## Prerequisites
 
