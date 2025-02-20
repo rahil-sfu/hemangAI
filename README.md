@@ -38,11 +38,13 @@ Before you begin, ensure you have the following installed on your system:
    git clone https://github.com/yourusername/project-title.git
    cd project-title
    ```
-2. ** Install Project Dependencies
+2. **Install Project Dependencies**
+   
    ```bash
    npm install
    ```
-3. ** Usage
+3. **Usage**
+   
    ```bash
    npm start
    ```
