@@ -15,7 +15,7 @@ Welcome to **HemangAI** – your one-stop solution for all your questions and pr
 - **Continuous Integration/Deployment:** Pre-configured for modern CI/CD pipelines.
 - **Responsive and Scalable:** Optimized for different platforms and use cases.
 
-## Screemshots
+## Screenshots
 Here are some screenshots of the project:
 ![Home Page](public/Screenshots/1.png)
 ![Settings Page](public/Screenshots/2.png)
